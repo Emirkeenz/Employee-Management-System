@@ -64,7 +64,10 @@
                      <TableColumn fx:id="salaryColumn" text="Salary" />
                  </columns>
                </TableView>
+               <Label fx:id="calculatedSalariesLabel" text="Calculated salaries" textAlignment="CENTER" visible="false" />
+               <Label fx:id="totalSalariesLabel" visible="false" />
                <Button onAction="#calculateSalaries" text="Calculate the salaries" />
+               <Button onAction="#updateSalaries" text="Update the salaries" />
                <Button onAction="#removeSelectedEmployee" text="Remove an employee" />
             </children>
          </VBox>
