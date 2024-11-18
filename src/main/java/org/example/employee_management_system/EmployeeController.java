@@ -46,11 +46,65 @@ public class EmployeeController {
 
     @FXML
     public void initialize() {
-        employeeTypeChoiceBox.setItems(FXCollections.observableArrayList("Full-Time", "Part-Time", "Contract"));
+        employeeTypeChoiceBox.setItems(FXCollections.observableArrayList( "Full-Time", "Part-Time", "Contract"));
+
+        // Слушатель для выбора типа сотрудника
+        employeeTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                switch (newValue) {
+                    case "Full-Time" -> {
+                        annualSalaryField.setDisable(false);
+                        hourlyRateField.setDisable(true);
+                        hoursWorkedField.setDisable(true);
+                        maxHoursField.setDisable(true);
+                        hourlyRateField.clear();
+                        hoursWorkedField.clear();
+                        maxHoursField.clear();
+                    }
+                    case "Part-Time" -> {
+                        annualSalaryField.setDisable(true);
+                        annualSalaryField.clear();
+                        hourlyRateField.setDisable(false);
+                        hoursWorkedField.setDisable(false);
+                        maxHoursField.setDisable(true);
+                        maxHoursField.clear();
+
+                    }
+                    case "Contract" -> {
+                        annualSalaryField.setDisable(true);
+                        annualSalaryField.clear();
+                        hourlyRateField.setDisable(false);
+                        hoursWorkedField.setDisable(true);
+                        hoursWorkedField.clear();
+                        maxHoursField.setDisable(false);
+
+                    }
+                }
+            } else {
+                // Если ничего не выбрано, отключаем все поля
+                annualSalaryField.setDisable(true);
+                hourlyRateField.setDisable(true);
+                hoursWorkedField.setDisable(true);
+                maxHoursField.setDisable(true);
+            }
+        });
+
+        // Устанавливаем начальное состояние (все поля отключены)
+        annualSalaryField.setDisable(true);
+        hourlyRateField.setDisable(true);
+        hoursWorkedField.setDisable(true);
+        maxHoursField.setDisable(true);
 
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         salaryColumn.setCellValueFactory(new PropertyValueFactory<>("calculatedSalary"));
+
+        nameColumn.prefWidthProperty().bind(employeeTable.widthProperty().multiply(0.33)); // 33%
+        typeColumn.prefWidthProperty().bind(employeeTable.widthProperty().multiply(0.33)); // 33%
+        salaryColumn.prefWidthProperty().bind(employeeTable.widthProperty().multiply(0.34)); // 34%
+
+        // Установка политики ресайза
+        employeeTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Делаем колонку зарплаты редактируемой
         salaryColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
@@ -150,6 +204,8 @@ public class EmployeeController {
         calculatedSalariesLabel.setVisible(true);
         totalSalariesLabel.setText(String.valueOf(totalSalary));
         totalSalariesLabel.setVisible(true);
+        calculatedSalariesLabel.setManaged(true);
+        totalSalariesLabel.setManaged(true);
     }
 
     @FXML
@@ -182,6 +238,14 @@ public class EmployeeController {
 
     private void clearFields() {
         nameField.clear();
+        hourlyRateField.clear();
+        hoursWorkedField.clear();
+        maxHoursField.clear();
+        annualSalaryField.clear();
+        employeeTypeChoiceBox.getSelectionModel().clearSelection();
+    }
+
+    private void clearTypeFields() {
         hourlyRateField.clear();
         hoursWorkedField.clear();
         maxHoursField.clear();

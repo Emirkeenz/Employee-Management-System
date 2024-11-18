@@ -57,15 +57,18 @@
          </VBox>
          <VBox alignment="TOP_CENTER" spacing="15.0">
             <children>
-               <TableView fx:id="employeeTable">
+               <TableView fx:id="employeeTable" editable="true">
                  <columns>
                    <TableColumn fx:id="nameColumn" text="Name" />
                      <TableColumn fx:id="typeColumn" text="Type" />
                      <TableColumn fx:id="salaryColumn" text="Salary" />
                  </columns>
+                  <columnResizePolicy>
+                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                  </columnResizePolicy>
                </TableView>
-               <Label fx:id="calculatedSalariesLabel" text="Calculated salaries" textAlignment="CENTER" visible="false" />
-               <Label fx:id="totalSalariesLabel" visible="false" />
+               <Label fx:id="calculatedSalariesLabel" style="-fx-managed: false;" text="Calculated salaries" textAlignment="CENTER" visible="false" />
+               <Label fx:id="totalSalariesLabel" style="-fx-managed: false;" visible="false" />
                <Button onAction="#calculateSalaries" text="Calculate the salaries" />
                <Button onAction="#updateSalaries" text="Update the salaries" />
                <Button onAction="#removeSelectedEmployee" text="Remove an employee" />
