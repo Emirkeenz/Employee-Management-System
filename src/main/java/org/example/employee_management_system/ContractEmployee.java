@@ -1,13 +1,16 @@
 package org.example.employee_management_system;
 
+import java.sql.Date;
+
 public class ContractEmployee extends Employee {
     private double hourlyRate;
     private double maxHours;
 
-    public ContractEmployee(String name, double hourlyRate, double maxHours) {
-        super(name, "Contract", 0);
+    public ContractEmployee(String name, String position, String type, Date hireDate, double hourlyRate, double maxHours) {
+        super(name, position, "Contract", hireDate);
         this.hourlyRate = hourlyRate;
         this.maxHours = maxHours;
+        calculateSalary();
     }
 
     public double getHourlyRate() {
@@ -16,6 +19,7 @@ public class ContractEmployee extends Employee {
 
     public void setHourlyRate(double hourlyRate) {
         this.hourlyRate = hourlyRate;
+        calculateSalary();
     }
 
     public double getMaxHours() {
@@ -24,12 +28,11 @@ public class ContractEmployee extends Employee {
 
     public void setMaxHours(double maxHours) {
         this.maxHours = maxHours;
+        calculateSalary();
     }
 
     @Override
-    public double calculateSalary() {
-        double salary = hourlyRate * maxHours;
-        setCalculatedSalary(salary);
-        return salary;
+    public void calculateSalary() {
+        setCalculatedSalary(hourlyRate * maxHours);
     }
 }

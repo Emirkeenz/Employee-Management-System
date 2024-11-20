@@ -1,14 +1,27 @@
 package org.example.employee_management_system;
 
+import java.sql.Date;
+
 public abstract class Employee {
+    private static long idCounter = 0;
+
+    private final long id;
     private String name;
+    private String position;
     private String type;
     private double calculatedSalary;
+    private Date hireDate;
 
-    public Employee(String name, String type, double calculatedSalary) {
+    public Employee(String name, String position, String type, Date hireDate) {
+        this.id = ++idCounter;
         this.name = name;
+        this.position = position;
         this.type = type;
-        this.calculatedSalary = calculatedSalary;
+        this.hireDate = hireDate;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getName() {
@@ -19,12 +32,28 @@ public abstract class Employee {
         this.name = name;
     }
 
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
     public String getType() {
         return type;
     }
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Date getHireDate() {
+        return hireDate;
+    }
+
+    public void setHireDate(Date hireDate) {
+        this.hireDate = hireDate;
     }
 
     public double getCalculatedSalary() {
@@ -35,6 +64,5 @@ public abstract class Employee {
         this.calculatedSalary = calculatedSalary;
     }
 
-    public abstract double calculateSalary();
+    public abstract void calculateSalary();
 }
-

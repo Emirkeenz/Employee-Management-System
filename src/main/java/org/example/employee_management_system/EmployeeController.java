@@ -1,19 +1,24 @@
 package org.example.employee_management_system;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.util.converter.DoubleStringConverter;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.time.LocalDate;
+import java.sql.Date;
+import java.sql.*;
+import java.time.format.DateTimeParseException;
 
 public class EmployeeController {
-
     @FXML
     private TextField nameField;
+    @FXML
+    private TextField positionField;
+    @FXML
+    private DatePicker hireDatePicker;
     @FXML
     private TextField hourlyRateField;
     @FXML
@@ -22,230 +27,95 @@ public class EmployeeController {
     private TextField maxHoursField;
     @FXML
     private TextField annualSalaryField;
-
     @FXML
     private ChoiceBox<String> employeeTypeChoiceBox;
 
     @FXML
     private TableView<Employee> employeeTable;
     @FXML
+    private TableColumn<Employee, Long> idColumn;
+    @FXML
     private TableColumn<Employee, String> nameColumn;
+    @FXML
+    private TableColumn<Employee, String> positionColumn;
+    @FXML
+    private TableColumn<Employee, LocalDate> hireDateColumn;
     @FXML
     private TableColumn<Employee, String> typeColumn;
     @FXML
     private TableColumn<Employee, Double> salaryColumn;
 
-    @FXML
-    private Label calculatedSalariesLabel;
-
-    @FXML
-    private Label totalSalariesLabel;
-
     private final ObservableList<Employee> employees = FXCollections.observableArrayList();
-    private final Map<Employee, Double> updatedSalaries = new HashMap<>();
 
     @FXML
     public void initialize() {
-        employeeTypeChoiceBox.setItems(FXCollections.observableArrayList( "Full-Time", "Part-Time", "Contract"));
+        employeeTypeChoiceBox.setItems(FXCollections.observableArrayList("Full-Time", "Part-Time", "Contract"));
 
-        // Слушатель для выбора типа сотрудника
-        employeeTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                switch (newValue) {
-                    case "Full-Time" -> {
-                        annualSalaryField.setDisable(false);
-                        hourlyRateField.setDisable(true);
-                        hoursWorkedField.setDisable(true);
-                        maxHoursField.setDisable(true);
-                        hourlyRateField.clear();
-                        hoursWorkedField.clear();
-                        maxHoursField.clear();
-                    }
-                    case "Part-Time" -> {
-                        annualSalaryField.setDisable(true);
-                        annualSalaryField.clear();
-                        hourlyRateField.setDisable(false);
-                        hoursWorkedField.setDisable(false);
-                        maxHoursField.setDisable(true);
-                        maxHoursField.clear();
-
-                    }
-                    case "Contract" -> {
-                        annualSalaryField.setDisable(true);
-                        annualSalaryField.clear();
-                        hourlyRateField.setDisable(false);
-                        hoursWorkedField.setDisable(true);
-                        hoursWorkedField.clear();
-                        maxHoursField.setDisable(false);
-
-                    }
-                }
-            } else {
-                // Если ничего не выбрано, отключаем все поля
-                annualSalaryField.setDisable(true);
-                hourlyRateField.setDisable(true);
-                hoursWorkedField.setDisable(true);
-                maxHoursField.setDisable(true);
-            }
-        });
-
-        // Устанавливаем начальное состояние (все поля отключены)
-        annualSalaryField.setDisable(true);
-        hourlyRateField.setDisable(true);
-        hoursWorkedField.setDisable(true);
-        maxHoursField.setDisable(true);
-
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        positionColumn.setCellValueFactory(new PropertyValueFactory<>("position"));
+        hireDateColumn.setCellValueFactory(new PropertyValueFactory<>("hireDate"));
+        typeColumn.setCellValueFactory(data -> {
+            if (data.getValue() instanceof FullTimeEmployee) {
+                return new SimpleStringProperty("Full-Time");
+            } else if (data.getValue() instanceof PartTimeEmployee) {
+                return new SimpleStringProperty("Part-Time");
+            } else if (data.getValue() instanceof ContractEmployee) {
+                return new SimpleStringProperty("Contract");
+            }
+            return null;
+        });
         salaryColumn.setCellValueFactory(new PropertyValueFactory<>("calculatedSalary"));
 
-        nameColumn.prefWidthProperty().bind(employeeTable.widthProperty().multiply(0.33)); // 33%
-        typeColumn.prefWidthProperty().bind(employeeTable.widthProperty().multiply(0.33)); // 33%
-        salaryColumn.prefWidthProperty().bind(employeeTable.widthProperty().multiply(0.34)); // 34%
-
-        // Установка политики ресайза
-        employeeTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        // Делаем колонку зарплаты редактируемой
-        salaryColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
-        salaryColumn.setOnEditCommit(event -> {
-            Employee employee = event.getRowValue();
-            Double newSalary = event.getNewValue();
-
-            if (newSalary != null && newSalary >= 0) {
-                // Обновляем значение зарплаты в HashMap
-                updatedSalaries.put(employee, newSalary);
-                employee.setCalculatedSalary(newSalary);
-                employeeTable.refresh();
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Ошибка ввода", "Зарплата должна быть положительным числом.");
-                employeeTable.refresh();
-            }
-        });
-
         employeeTable.setItems(employees);
-        employeeTable.setEditable(true); // Включаем возможность редактирования таблицы
     }
 
     @FXML
     private void addEmployee() {
         try {
             String name = nameField.getText().trim();
+            String position = positionField.getText().trim();
+            Date hireDate = Date.valueOf(hireDatePicker.getValue());
             String type = employeeTypeChoiceBox.getValue();
 
-            if (name.isEmpty() || type == null) {
-                showAlert(Alert.AlertType.WARNING, "Ошибка ввода", "Заполните имя и выберите тип сотрудника.");
+            if (name.isEmpty() || position.isEmpty() || hireDate == null || type == null) {
+                showAlert(Alert.AlertType.WARNING, "Ошибка ввода", "Заполните все поля.");
                 return;
             }
 
             Employee employee = null;
-
             switch (type) {
                 case "Full-Time" -> {
-                    double annualSalary = Double.parseDouble(annualSalaryField.getText().trim());
-                    if (annualSalary < 0) {
-                        showAlert(Alert.AlertType.ERROR, "Ошибка ввода", "Годовая зарплата не может быть отрицательной.");
-                        return;
-                    }
-                    employee = new FullTimeEmployee(name, annualSalary);
+                    // Инициализация для Full-Time сотрудника
+                    double monthlySalary = Double.parseDouble(annualSalaryField.getText().trim()); // Вероятно, здесь предполагается годовая зарплата
+                    employee = new FullTimeEmployee(name, position, "Full-Time", hireDate, monthlySalary);
                 }
                 case "Part-Time" -> {
+                    // Инициализация для Part-Time сотрудника
                     double hourlyRate = Double.parseDouble(hourlyRateField.getText().trim());
                     double hoursWorked = Double.parseDouble(hoursWorkedField.getText().trim());
-                    if (hourlyRate < 0 || hoursWorked < 0) {
-                        showAlert(Alert.AlertType.ERROR, "Ошибка ввода", "Почасовая ставка и отработанные часы не могут быть отрицательными.");
-                        return;
-                    }
-                    employee = new PartTimeEmployee(name, hourlyRate, hoursWorked);
+                    employee = new PartTimeEmployee(name, position, "Part-Time", hireDate, hourlyRate, hoursWorked);
                 }
                 case "Contract" -> {
+                    // Инициализация для Contract сотрудника
                     double hourlyRate = Double.parseDouble(hourlyRateField.getText().trim());
                     double maxHours = Double.parseDouble(maxHoursField.getText().trim());
-                    if (hourlyRate < 0 || maxHours < 0) {
-                        showAlert(Alert.AlertType.ERROR, "Ошибка ввода", "Почасовая ставка и максимальные часы не могут быть отрицательными.");
-                        return;
-                    }
-                    employee = new ContractEmployee(name, hourlyRate, maxHours);
+                    employee = new ContractEmployee(name, position, "Contract", hireDate, hourlyRate, maxHours);
                 }
             }
 
-            if (employee != null) {
-                employee.calculateSalary();
-                employees.add(employee);
-                clearFields();
-            }
+            employees.add(employee);
+            clearFields();
         } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Ошибка ввода", "Убедитесь, что числовые значения введены корректно.");
+            showAlert(Alert.AlertType.ERROR, "Ошибка ввода", "Введите числовые значения для зарплаты и часов.");
         }
     }
 
-    @FXML
-    private void calculateSalaries() {
-        if (employees.isEmpty()) {
-            showAlert(Alert.AlertType.INFORMATION, "Нет сотрудников", "Добавьте сотрудников перед расчетом зарплат.");
-            return;
-        }
-
-        double totalSalary = 0.0;
-        for (Employee employee : employees) {
-            // Если зарплата обновлена вручную, берем ее из HashMap
-            if (updatedSalaries.containsKey(employee)) {
-                totalSalary += updatedSalaries.get(employee);
-            } else {
-                employee.calculateSalary();
-                totalSalary += employee.getCalculatedSalary();
-            }
-        }
-
-        employeeTable.refresh();
-
-        // Отображаем результат в метке
-        calculatedSalariesLabel.setText("Общая сумма зарплат: ");
-        calculatedSalariesLabel.setVisible(true);
-        totalSalariesLabel.setText(String.valueOf(totalSalary));
-        totalSalariesLabel.setVisible(true);
-        calculatedSalariesLabel.setManaged(true);
-        totalSalariesLabel.setManaged(true);
-    }
-
-    @FXML
-    private void removeSelectedEmployee() {
-        Employee selectedEmployee = employeeTable.getSelectionModel().getSelectedItem();
-        if (selectedEmployee != null) {
-            employees.remove(selectedEmployee);
-        } else {
-            showAlert(Alert.AlertType.WARNING, "Удаление сотрудника", "Выберите сотрудника для удаления.");
-        }
-    }
-
-    @FXML
-    private void updateSalaries() {
-        if (updatedSalaries.isEmpty()) {
-            showAlert(Alert.AlertType.INFORMATION, "Обновление", "Измененных зарплат нет.");
-            return;
-        }
-
-        for (Map.Entry<Employee, Double> entry : updatedSalaries.entrySet()) {
-            Employee employee = entry.getKey();
-            Double newSalary = entry.getValue();
-
-            employee.setCalculatedSalary(newSalary);
-        }
-
-        employeeTable.refresh();
-        showAlert(Alert.AlertType.INFORMATION, "Обновление", "Зарплаты успешно обновлены.");
-    }
 
     private void clearFields() {
         nameField.clear();
-        hourlyRateField.clear();
-        hoursWorkedField.clear();
-        maxHoursField.clear();
-        annualSalaryField.clear();
-        employeeTypeChoiceBox.getSelectionModel().clearSelection();
-    }
-
-    private void clearTypeFields() {
+        positionField.clear();
+        hireDatePicker.setValue(null);
         hourlyRateField.clear();
         hoursWorkedField.clear();
         maxHoursField.clear();

@@ -1,24 +1,34 @@
 package org.example.employee_management_system;
 
+import java.sql.Date;
+
 public class FullTimeEmployee extends Employee {
-    private double annualSalary;
+    private double monthlySalary;
 
-    public FullTimeEmployee(String name, double annualSalary) {
-        super(name, "Full-Time", 0);
-        this.annualSalary = annualSalary;
+    public FullTimeEmployee(String name, String position, String type, Date hireDate, double monthlySalary) {
+        super(name, position, type, hireDate);
+        this.monthlySalary = monthlySalary;
+        calculateSalary();
     }
 
-    public double getAnnualSalary() {
-        return annualSalary;
+    public double getMonthlySalary() {
+        return monthlySalary;
     }
 
-    public void setAnnualSalary(double annualSalary) {
-        this.annualSalary = annualSalary;
+    public void setMonthlySalary(double monthlySalary) {
+        this.monthlySalary = monthlySalary;
+        calculateSalary();
     }
 
     @Override
-    public double calculateSalary() {
-        setCalculatedSalary(annualSalary);
-        return annualSalary;
+    public void calculateSalary() {
+        setCalculatedSalary(monthlySalary);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", FullTimeEmployee{" +
+                "monthlySalary=" + monthlySalary +
+                '}';
     }
 }
