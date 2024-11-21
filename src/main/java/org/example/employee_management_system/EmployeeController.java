@@ -45,6 +45,11 @@ public class EmployeeController {
     @FXML
     private TableColumn<Employee, Double> salaryColumn;
 
+    @FXML
+    private Label totalSalaryLabel;
+    @FXML
+    private Label calculatedSalariesLabel;
+
     private final ObservableList<Employee> employees = FXCollections.observableArrayList();
 
     @FXML
@@ -110,6 +115,26 @@ public class EmployeeController {
             showAlert(Alert.AlertType.ERROR, "Ошибка ввода", "Введите числовые значения для зарплаты и часов.");
         }
     }
+
+    @FXML
+    private void calculateSalaries() {
+        double totalSalary = 0.0;
+        for (Employee employee : employees) {
+            employee.calculateSalary();
+            System.out.println("Employee: " + employee.getName() + ", Calculated Salary: " + employee.getCalculatedSalary());
+            totalSalary += employee.getCalculatedSalary();
+            System.out.println(totalSalary);
+        }
+
+        employeeTable.refresh();
+        calculatedSalariesLabel.setText("Общая сумма зарплат: ");
+        calculatedSalariesLabel.setVisible(true);
+        calculatedSalariesLabel.setManaged(true);
+        totalSalaryLabel.setText(String.valueOf(totalSalary));
+        totalSalaryLabel.setVisible(true);
+        totalSalaryLabel.setManaged(true);
+    }
+
 
 
     private void clearFields() {

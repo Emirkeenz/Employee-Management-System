@@ -78,8 +78,8 @@
                   </columnResizePolicy>
                </TableView>
                <Label fx:id="calculatedSalariesLabel" style="-fx-managed: false;" text="Calculated salaries" textAlignment="CENTER" visible="false" />
-               <Label fx:id="totalSalariesLabel" style="-fx-managed: false;" visible="false" />
-               <Button text="Calculate the salaries" />
+               <Label fx:id="totalSalaryLabel" style="-fx-managed: false;" visible="false" />
+               <Button onAction="#calculateSalaries" text="Calculate the salaries" />
                <Button text="Update the salaries" />
                <Button text="Remove an employee" />
             </children>
