@@ -120,7 +120,7 @@ public class EmployeeController {
 
             employees.add(employee);
             employeeData.addEmployee(employee);
-//            employees.clear();
+            employees.clear();
             employees.addAll(employeeData.getAllEmployees());
             clearFields();
             showAlert(Alert.AlertType.INFORMATION, "Успех", "Сотрудник успешно добавлен.");

@@ -8,9 +8,9 @@ public class EmployeeData {
     private Connection connection;
 
     public EmployeeData() {
-        String url = "jdbc:postgresql:employee_db"; // Название базы данных
+        String url = "jdbc:postgresql:"; // Название базы данных
         String username = "postgres";         // Имя пользователя
-        String password = "Tls06141301";      // Пароль
+        String password = "";      // Пароль
 
         try {
             connection = DriverManager.getConnection(url, username, password);
@@ -38,7 +38,7 @@ public class EmployeeData {
             } else if (employee instanceof ContractEmployee contract) {
                 statement.setDouble(6, contract.getHourlyRate());
                 statement.setNull(7, Types.DOUBLE);
-                statement.setDouble(8, contract.getMaxHours());
+                statement.setObject(8, contract.getMaxHours(), Types.DOUBLE);
             } else {
                 statement.setNull(6, Types.DOUBLE);
                 statement.setNull(7, Types.DOUBLE);
