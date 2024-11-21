@@ -5,7 +5,7 @@ import java.sql.Date;
 public abstract class Employee {
     private static long idCounter = 0;
 
-    private final long id;
+    private long id;
     private String name;
     private String position;
     private String type;
@@ -22,6 +22,10 @@ public abstract class Employee {
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) { // Добавлен сеттер для ID
+        this.id = id;
     }
 
     public String getName() {

@@ -3,12 +3,24 @@ package org.example.employee_management_system;
 import java.sql.Date;
 
 public class FullTimeEmployee extends Employee {
+    private long id;
     private double monthlySalary;
 
-    public FullTimeEmployee(String name, String position, String type, Date hireDate, double monthlySalary) {
-        super(name, position, type, hireDate);
+    public FullTimeEmployee(long id, String name, String position, String type, Date hireDate, double monthlySalary) {
+        super(name, position, "FullTime", hireDate);
+        this.id = id;
         this.monthlySalary = monthlySalary;
         calculateSalary();
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(long id) {
+        this.id = id;
     }
 
     public double getMonthlySalary() {
@@ -27,8 +39,9 @@ public class FullTimeEmployee extends Employee {
 
     @Override
     public String toString() {
-        return super.toString() + ", FullTimeEmployee{" +
-                "monthlySalary=" + monthlySalary +
+        return "FullTimeEmployee{" +
+                "id=" + id +
+                ", monthlySalary=" + monthlySalary +
                 '}';
     }
 }

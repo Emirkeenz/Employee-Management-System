@@ -50,7 +50,13 @@ public class EmployeeController {
     @FXML
     private Label calculatedSalariesLabel;
 
-    private final ObservableList<Employee> employees = FXCollections.observableArrayList();
+    private ObservableList<Employee> employees = FXCollections.observableArrayList();
+    private EmployeeData employeeData;
+
+    public EmployeeController() {
+        employeeData = new EmployeeData();
+        employees = FXCollections.observableArrayList(employeeData.getAllEmployees());
+    }
 
     @FXML
     public void initialize() {
@@ -80,39 +86,47 @@ public class EmployeeController {
         try {
             String name = nameField.getText().trim();
             String position = positionField.getText().trim();
-            Date hireDate = Date.valueOf(hireDatePicker.getValue());
+            LocalDate hireDateLocal = hireDatePicker.getValue();
             String type = employeeTypeChoiceBox.getValue();
 
-            if (name.isEmpty() || position.isEmpty() || hireDate == null || type == null) {
+            if (name.isEmpty() || position.isEmpty() || hireDateLocal == null || type == null) {
                 showAlert(Alert.AlertType.WARNING, "Ошибка ввода", "Заполните все поля.");
                 return;
             }
 
+            Date hireDate = Date.valueOf(hireDateLocal);
             Employee employee = null;
+            long tempId = 0;
+
             switch (type) {
                 case "Full-Time" -> {
                     // Инициализация для Full-Time сотрудника
                     double monthlySalary = Double.parseDouble(annualSalaryField.getText().trim()); // Вероятно, здесь предполагается годовая зарплата
-                    employee = new FullTimeEmployee(name, position, "Full-Time", hireDate, monthlySalary);
+                    employee = new FullTimeEmployee(0, name, position, "Full-Time", hireDate, monthlySalary);
                 }
                 case "Part-Time" -> {
                     // Инициализация для Part-Time сотрудника
                     double hourlyRate = Double.parseDouble(hourlyRateField.getText().trim());
                     double hoursWorked = Double.parseDouble(hoursWorkedField.getText().trim());
-                    employee = new PartTimeEmployee(name, position, "Part-Time", hireDate, hourlyRate, hoursWorked);
+                    employee = new PartTimeEmployee(0, name, position, "Part-Time", hireDate, hourlyRate, hoursWorked);
                 }
                 case "Contract" -> {
                     // Инициализация для Contract сотрудника
                     double hourlyRate = Double.parseDouble(hourlyRateField.getText().trim());
                     double maxHours = Double.parseDouble(maxHoursField.getText().trim());
-                    employee = new ContractEmployee(name, position, "Contract", hireDate, hourlyRate, maxHours);
+                    employee = new ContractEmployee(0, name, position, "Contract", hireDate, hourlyRate, maxHours);
                 }
             }
 
             employees.add(employee);
+            employeeData.addEmployee(employee);
+//            employees.clear();
+            employees.addAll(employeeData.getAllEmployees());
             clearFields();
+            showAlert(Alert.AlertType.INFORMATION, "Успех", "Сотрудник успешно добавлен.");
         } catch (NumberFormatException e) {
             showAlert(Alert.AlertType.ERROR, "Ошибка ввода", "Введите числовые значения для зарплаты и часов.");
+            showAlert(Alert.AlertType.ERROR, "Ошибка базы данных", "Не удалось добавить сотрудника: ");
         }
     }
 
