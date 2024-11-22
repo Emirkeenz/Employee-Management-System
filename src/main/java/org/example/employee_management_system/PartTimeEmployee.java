@@ -1,13 +1,14 @@
 package org.example.employee_management_system;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 public class PartTimeEmployee extends Employee {
     private long id;
     private double hoursWorked;
     private double hourlyRate;
 
-    public PartTimeEmployee(long id, String name, String position, String type, Date hireDate, double hourlyRate, double hoursWorked) {
+    public PartTimeEmployee(long id, String name, String position, String type, LocalDate hireDate, double hourlyRate, double hoursWorked) {
         super(name, position, "PartTime", hireDate);
         this.id = id;
         this.hourlyRate = hourlyRate;

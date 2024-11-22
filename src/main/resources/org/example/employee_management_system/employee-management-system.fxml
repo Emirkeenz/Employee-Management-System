@@ -80,8 +80,8 @@
                <Label fx:id="calculatedSalariesLabel" style="-fx-managed: false;" text="Calculated salaries" textAlignment="CENTER" visible="false" />
                <Label fx:id="totalSalaryLabel" style="-fx-managed: false;" visible="false" />
                <Button onAction="#calculateSalaries" text="Calculate the salaries" />
-               <Button text="Update the salaries" />
-               <Button text="Remove an employee" />
+               <Button onAction="#updateSelectedEmployee" text="Update the employee" />
+               <Button onAction="#deleteSelectedEmployee" text="Remove an employee" />
             </children>
          </VBox>
       </children>

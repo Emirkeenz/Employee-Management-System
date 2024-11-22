@@ -8,9 +8,9 @@ public class EmployeeData {
     private Connection connection;
 
     public EmployeeData() {
-        String url = "jdbc:postgresql:"; // Название базы данных
-        String username = "postgres";         // Имя пользователя
-        String password = "";      // Пароль
+        String url = "jdbc:postgresql:employee_db";
+        String username = "postgres";
+        String password = "";
 
         try {
             connection = DriverManager.getConnection(url, username, password);
@@ -28,7 +28,7 @@ public class EmployeeData {
             statement.setString(1, employee.getName());
             statement.setString(2, employee.getPosition());
             statement.setString(3, employee.getType());
-            statement.setDate(4, employee.getHireDate());
+            statement.setDate(4, Date.valueOf(employee.getHireDate())); // hireDate из LocalDate
             statement.setDouble(5, employee.getCalculatedSalary());
 
             if (employee instanceof PartTimeEmployee partTime) {
@@ -72,7 +72,7 @@ public class EmployeeData {
             statement.setString(1, employee.getName());
             statement.setString(2, employee.getPosition());
             statement.setString(3, employee.getType());
-            statement.setDate(4, employee.getHireDate());
+            statement.setDate(4, Date.valueOf(employee.getHireDate())); // hireDate из LocalDate
             statement.setDouble(5, employee.getCalculatedSalary());
             statement.setInt(6, id);
             statement.executeUpdate();
@@ -99,7 +99,7 @@ public class EmployeeData {
                             resultSet.getString("name"),
                             resultSet.getString("position"),
                             type,
-                            resultSet.getDate("hire_date"),
+                            resultSet.getDate("hire_date").toLocalDate(),
                             resultSet.getDouble("calculated_salary")
                     );
                     case "PartTime" -> employee = new PartTimeEmployee(
@@ -107,7 +107,7 @@ public class EmployeeData {
                             resultSet.getString("name"),
                             resultSet.getString("position"),
                             type,
-                            resultSet.getDate("hire_date"),
+                            resultSet.getDate("hire_date").toLocalDate(),
                             resultSet.getDouble("hourly_rate"),
                             resultSet.getDouble("hours_worked")
                     );
@@ -116,7 +116,7 @@ public class EmployeeData {
                             resultSet.getString("name"),
                             resultSet.getString("position"),
                             type,
-                            resultSet.getDate("hire_date"),
+                            resultSet.getDate("hire_date").toLocalDate(),
                             resultSet.getDouble("hourly_rate"),
                             resultSet.getDouble("max_hours")
                     );
@@ -148,7 +148,7 @@ public class EmployeeData {
                             resultSet.getString("name"),
                             resultSet.getString("position"),
                             type,
-                            resultSet.getDate("hire_date"),
+                            resultSet.getDate("hire_date").toLocalDate(),
                             resultSet.getDouble("calculated_salary")
                     );
                     case "PartTime" -> new PartTimeEmployee(
@@ -156,7 +156,7 @@ public class EmployeeData {
                             resultSet.getString("name"),
                             resultSet.getString("position"),
                             type,
-                            resultSet.getDate("hire_date"),
+                            resultSet.getDate("hire_date").toLocalDate(),
                             resultSet.getDouble("hourly_rate"),
                             resultSet.getDouble("hours_worked")
                     );
@@ -165,7 +165,7 @@ public class EmployeeData {
                             resultSet.getString("name"),
                             resultSet.getString("position"),
                             type,
-                            resultSet.getDate("hire_date"),
+                            resultSet.getDate("hire_date").toLocalDate(),
                             resultSet.getDouble("hourly_rate"),
                             resultSet.getDouble("max_hours")
                     );

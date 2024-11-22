@@ -1,6 +1,7 @@
 package org.example.employee_management_system;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 public abstract class Employee {
     private static long idCounter = 0;
@@ -10,9 +11,9 @@ public abstract class Employee {
     private String position;
     private String type;
     private double calculatedSalary;
-    private Date hireDate;
+    private LocalDate hireDate;
 
-    public Employee(String name, String position, String type, Date hireDate) {
+    public Employee(String name, String position, String type, LocalDate hireDate) {
         this.id = ++idCounter;
         this.name = name;
         this.position = position;
@@ -52,11 +53,11 @@ public abstract class Employee {
         this.type = type;
     }
 
-    public Date getHireDate() {
+    public LocalDate getHireDate() {
         return hireDate;
     }
 
-    public void setHireDate(Date hireDate) {
+    public void setHireDate(LocalDate hireDate) {
         this.hireDate = hireDate;
     }
 
