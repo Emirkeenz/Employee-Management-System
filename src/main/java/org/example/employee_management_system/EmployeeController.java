@@ -220,6 +220,7 @@ public class EmployeeController {
                 selectedEmployee.setPosition(newPosition);
             }
 
+            newHireDate = hireDatePicker.getValue();
             if (newHireDate != null) {
                 selectedEmployee.setHireDate(Date.valueOf(newHireDate).toLocalDate());
             }

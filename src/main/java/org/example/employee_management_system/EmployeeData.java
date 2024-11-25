@@ -10,7 +10,7 @@ public class EmployeeData {
     public EmployeeData() {
         String url = "jdbc:postgresql:employee_db";
         String username = "postgres";
-        String password = "";
+        String password = "Tls06141301";
 
         try {
             connection = DriverManager.getConnection(url, username, password);
@@ -67,18 +67,25 @@ public class EmployeeData {
     }
 
     public void updateEmployee(int id, Employee employee) {
-        String query = "UPDATE employee SET name = ?, position = ?, type = ?, hire_date = ?, calculated_salary = ? WHERE id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, employee.getName());
-            statement.setString(2, employee.getPosition());
-            statement.setString(3, employee.getType());
-            statement.setDate(4, Date.valueOf(employee.getHireDate())); // hireDate из LocalDate
-            statement.setDouble(5, employee.getCalculatedSalary());
-            statement.setInt(6, id);
-            statement.executeUpdate();
-            System.out.println("Employee updated successfully.");
+        String sql = "UPDATE employee SET name = ?, position = ?, type = ?, hire_date = ?, calculated_salary = ? WHERE id = ?";
+        try (Connection connection = DriverManager.getConnection("jdbc:postgresql:employee_db", "postgres", "Tls06141301");
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, employee.getName());  // имя сотрудника
+            preparedStatement.setString(2, employee.getPosition());  // должность
+            preparedStatement.setString(3, employee.getType());  // тип сотрудника
+            preparedStatement.setDate(4, Date.valueOf(employee.getHireDate()));  // дата найма
+            preparedStatement.setDouble(5, employee.getCalculatedSalary());  // расчетная зарплата
+            preparedStatement.setInt(6, id);  // id сотрудника
+
+            int rowsUpdated = preparedStatement.executeUpdate();
+            if (rowsUpdated == 0) {
+                System.out.println("No employee found with ID: " + id);
+            } else {
+                System.out.println("Employee updated successfully.");
+            }
         } catch (SQLException e) {
-            System.out.println("Error updating employee: " + e);
+            System.out.println("Error updating employee: " + e.getMessage());
         }
     }
 
